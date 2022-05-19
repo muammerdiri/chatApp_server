@@ -3,6 +3,7 @@ package model;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class ClientHandler implements Runnable {
 
@@ -40,6 +41,22 @@ public class ClientHandler implements Runnable {
     //! Runnable implementation, thread start function.
     @Override
     public void run() {
+
+        //!  Capturing the client public key
+        byte[] bytePublicKey=null;
+        try {
+            int length= inputStream.readInt();
+            if(length>0){
+                bytePublicKey = new byte[length];
+                inputStream.readFully(bytePublicKey,0,length);
+            }
+            System.out.println(Arrays.toString(bytePublicKey));
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        //! infinity loop message send
         byte[] messageFromClient=null;
         while (socket.isConnected()) {
             try {
