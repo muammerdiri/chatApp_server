@@ -50,7 +50,7 @@ public class ClientHandler implements Runnable {
                 bytePublicKey = new byte[length];
                 inputStream.readFully(bytePublicKey,0,length);
             }
-            System.out.println(Arrays.toString(bytePublicKey));
+            System.out.println(clientUsername+": "+Arrays.toString(bytePublicKey));
 
         }catch (Exception e){
             e.printStackTrace();
