@@ -1,4 +1,4 @@
-package opcodes.constant;
+package tools;
 
 public class ProtocolName {
     /**
