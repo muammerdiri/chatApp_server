@@ -9,7 +9,7 @@ public class HelloCA implements IHelloCA{
     }
 
     @Override
-    public byte[] commentMessage(byte opcode, int dataLength, byte[] data) {
+    public byte[] commantMessage(byte opcode, int dataLength, byte[] data) {
         //Main array = { header +opcode + Length + Data }
         byte [] responseData ={tools.ProtocolName.COMMAND_HEADER,tools.ProtocolName.HELLO,0x00};
 
