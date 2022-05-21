@@ -1,4 +1,4 @@
-import opcodes.constant.ProtocolName;
+import tools.ProtocolName;
 
 import java.nio.ByteBuffer;
 
