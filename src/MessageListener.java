@@ -9,7 +9,6 @@ import tools.Tools;
 public class MessageListener {
     private byte [] message;
     SignatureMessageBuilder sign;
-
     HelloMessageBuilder hello;
 
     public byte[] getMessage() {
@@ -28,7 +27,7 @@ public class MessageListener {
                     case (ProtocolName.OPCODE_SIGN_PK):
                         sign = new SignatureMessageBuilder();
                         sign.setMessage(new SignaturePublicKey());
-                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem")).getBytes();
+                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem"));
 
                     case (ProtocolName.HELLO):
                         hello = new HelloMessageBuilder();
@@ -42,7 +41,7 @@ public class MessageListener {
                     case (ProtocolName.OPCODE_SIGN_PK):
                         sign = new SignatureMessageBuilder();
                         sign.setMessage(new SignaturePublicKey());
-                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem")).getBytes();
+                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem"));
 
                     case (ProtocolName.HELLO):
                         hello = new HelloMessageBuilder();
