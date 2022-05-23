@@ -51,7 +51,7 @@ public class ClientHandler implements Runnable {
                 bytePublicKey = new byte[length];
                 inputStream.readFully(bytePublicKey,0,length);
             }
-            System.out.println(clientUsername+": "+byteToHex(bytePublicKey));
+            System.out.println(clientUsername+" public key: "+byteToHex(bytePublicKey));
             clientBroadcastMessage(bytePublicKey);
 
         }catch (Exception e){
@@ -107,6 +107,7 @@ public class ClientHandler implements Runnable {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
                 if (clientHandler.clientUsername.equals(clientUsername)) {
+                    //MessageListener messageListener = new MessageListener();
                     clientHandler.outputStream.write(messageToSend);
                     clientHandler.outputStream.flush();
                 }
