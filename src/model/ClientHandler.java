@@ -4,6 +4,7 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Formatter;
 
 public class ClientHandler implements Runnable {
 
@@ -50,7 +51,8 @@ public class ClientHandler implements Runnable {
                 bytePublicKey = new byte[length];
                 inputStream.readFully(bytePublicKey,0,length);
             }
-            System.out.println(clientUsername+": "+Arrays.toString(bytePublicKey));
+            System.out.println(clientUsername+": "+byteToHex(bytePublicKey));
+            clientBroadcastMessage(bytePublicKey);
 
         }catch (Exception e){
             e.printStackTrace();
@@ -73,7 +75,17 @@ public class ClientHandler implements Runnable {
         }
     }
 
-
+    String byteToHex(final byte[] hash)
+    {
+        Formatter formatter = new Formatter();
+        for (byte b : hash)
+        {
+            formatter.format("%02x ", b);
+        }
+        String result = formatter.toString();
+        formatter.close();
+        return result;
+    }
 
     public void broadcastMessage(byte[] messageToSend) {
         for (ClientHandler clientHandler : clientHandlers) {
@@ -81,6 +93,20 @@ public class ClientHandler implements Runnable {
 
                 //! istemci kendi dışında ki istemcilere mesaj yollama koşulu.
                 if (clientHandler.clientUsername.equals(otherClientUsername)) {
+                    clientHandler.outputStream.write(messageToSend);
+                    clientHandler.outputStream.flush();
+                }
+            } catch (IOException e) {
+                // Gracefully close everything.
+                closeEverything(socket, bufferedReader, bufferedWriter,outputStream,inputStream);
+            }
+        }
+    }
+
+    public void clientBroadcastMessage(byte[] messageToSend) {
+        for (ClientHandler clientHandler : clientHandlers) {
+            try {
+                if (clientHandler.clientUsername.equals(clientUsername)) {
                     clientHandler.outputStream.write(messageToSend);
                     clientHandler.outputStream.flush();
                 }
