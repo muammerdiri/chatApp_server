@@ -9,12 +9,12 @@ public class SignatureMessageBuilder {
     private ISignaturePublicKey message;
 
 
-    public String commantMessage(byte [] clientPublicKey, PrivateKey serverPrivateKey){
+    public byte[] commantMessage(byte [] clientPublicKey, PrivateKey serverPrivateKey){
         return message.signatureCommantMessage(clientPublicKey,serverPrivateKey);
     }
 
-    public void responseMessage(){
-        message.successResponseMessage();
+    public byte[] responseMessage(byte [] signedText){
+        return message.successResponseMessage(signedText);
     }
 
     public ISignaturePublicKey getMessage() {
