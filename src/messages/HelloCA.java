@@ -3,7 +3,8 @@ package messages;
 import java.nio.ByteBuffer;
 
 public class HelloCA implements IHelloCA{
-    
+
+
     @Override
     public byte[] successResponseMessage(byte opcode, int dataLength, byte[] data) {
         return new byte[0];
