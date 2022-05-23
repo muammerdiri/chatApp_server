@@ -9,6 +9,7 @@ import tools.Tools;
 public class MessageListener {
     private byte [] message;
     SignatureMessageBuilder sign;
+
     HelloMessageBuilder hello;
 
     public byte[] getMessage() {
