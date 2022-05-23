@@ -1,5 +1,6 @@
 package messages;
 
+import tools.ProtocolName;
 import tools.Tools;
 
 import java.nio.ByteBuffer;
@@ -32,8 +33,16 @@ public class SignaturePublicKey implements ISignaturePublicKey {
     }
 
     @Override
-    public byte[] successResponseMessage() {
-        return new byte[0];
+    public byte[] successResponseMessage(byte [] signedText) {
+
+        byte[] lengthToByte = ByteBuffer.allocate(2).putShort((short)signedText.length).array();
+        byte[] statusWord = ByteBuffer.allocate(2).putShort((short)ProtocolName.SUCCESS_STATUS).array();
+        byte [] responseData = {ProtocolName.RESPONSE_HEADER,ProtocolName.OPCODE_SIGN_PK};
+        responseData = Tools.byteArrayConcatenation(responseData,statusWord);
+        responseData =Tools.byteArrayConcatenation(responseData,lengthToByte);
+        responseData = Tools.byteArrayConcatenation(responseData,signedText);
+
+        return responseData;
     }
 
 }
