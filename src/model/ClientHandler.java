@@ -103,11 +103,12 @@ public class ClientHandler implements Runnable {
         }
     }
 
+
     public void clientBroadcastMessage(byte[] messageToSend) {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
                 if (clientHandler.clientUsername.equals(clientUsername)) {
-                    //MessageListener messageListener = new MessageListener();
+                    // MessageListener messageListener = new MessageListener();
                     clientHandler.outputStream.write(messageToSend);
                     clientHandler.outputStream.flush();
                 }

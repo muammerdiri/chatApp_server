@@ -1,6 +1,4 @@
 
-import builders.HelloMessageBuilder;
-import builders.SignatureMessageBuilder;
 import messages.HelloCA;
 import messages.SignaturePublicKey;
 import tools.ProtocolName;
@@ -8,8 +6,8 @@ import tools.Tools;
 
 public class MessageListener {
     private byte [] message;
-    SignatureMessageBuilder sign;
-    HelloMessageBuilder hello;
+    SignaturePublicKey sign;
+    HelloCA hello;
 
     public byte[] getMessage() {
         return message;
@@ -25,13 +23,11 @@ public class MessageListener {
             if (message[0] == ProtocolName.COMMAND_HEADER) {
                 switch (message[1]) {
                     case (ProtocolName.OPCODE_SIGN_PK):
-                        sign = new SignatureMessageBuilder();
-                        sign.setMessage(new SignaturePublicKey());
-                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem"));
+                        sign = new SignaturePublicKey();
+                        message = sign.signatureCommantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem"));
 
                     case (ProtocolName.HELLO):
-                        hello = new HelloMessageBuilder();
-                        hello.setHelloCA(new HelloCA());
+                        hello = new HelloCA();
                         hello.commantMessage(message);
                 }
 
@@ -39,14 +35,12 @@ public class MessageListener {
 
                 switch (message[1]) {
                     case (ProtocolName.OPCODE_SIGN_PK):
-                        sign = new SignatureMessageBuilder();
-                        sign.setMessage(new SignaturePublicKey());
-                        message = sign.commantMessage(publicKeyByte(message), Tools.fileToPrivateKey("private_key.pem"));
+                        sign = new SignaturePublicKey();
+                        message = sign.successResponseMessage(message);
 
                     case (ProtocolName.HELLO):
-                        hello = new HelloMessageBuilder();
-                        hello.setHelloCA(new HelloCA());
-                        hello.commantMessage(message);
+                        hello = new HelloCA();
+                        //hello.successResponseMessage(message);
                 }
             }
         }catch (Exception e){
