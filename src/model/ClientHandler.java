@@ -1,5 +1,7 @@
 package model;
 
+import protocol.State;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ public class ClientHandler implements Runnable {
     public String otherClientUsername;
     private DataInputStream inputStream=null;
     private DataOutputStream outputStream = null;
+    private State state;
 
 
     public ClientHandler(Socket socket) {
@@ -95,6 +98,7 @@ public class ClientHandler implements Runnable {
                 if (clientHandler.clientUsername.equals(otherClientUsername)) {
                     clientHandler.outputStream.write(messageToSend);
                     clientHandler.outputStream.flush();
+                    this.state = State.SEND_MESSAGE;
                 }
             } catch (IOException e) {
                 // Gracefully close everything.
@@ -111,6 +115,7 @@ public class ClientHandler implements Runnable {
                     // MessageListener messageListener = new MessageListener();
                     clientHandler.outputStream.write(messageToSend);
                     clientHandler.outputStream.flush();
+                    this.state = State.SEND_PUBLIC_KEY;
                 }
             } catch (IOException e) {
                 // Gracefully close everything.
@@ -123,6 +128,7 @@ public class ClientHandler implements Runnable {
     public void removeClientHandler() {
         clientHandlers.remove(this);
         System.out.println("SERVER: " + clientUsername + " sohbet ekranından ayrıldı!");
+        this.state = State.BYE;
     }
 
     //! Function to close all builds.
