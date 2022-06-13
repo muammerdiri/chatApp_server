@@ -1,7 +1,7 @@
 package model;
 
-import protocol.State;
 
+import javax.net.ssl.SSLSocket;
 import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -12,28 +12,30 @@ public class ClientHandler implements Runnable {
 
     public static ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
 
-
-    private Socket socket;
+    private SSLSocket socket;
     private BufferedReader bufferedReader;
     private BufferedWriter bufferedWriter;
     public String clientUsername;
     public String otherClientUsername;
     private DataInputStream inputStream=null;
     private DataOutputStream outputStream = null;
-    private State state;
 
 
-    public ClientHandler(Socket socket) {
+
+    public ClientHandler(SSLSocket socket) {
         try {
             this.socket = socket;
-            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.bufferedWriter= new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+//            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+//            this.bufferedWriter= new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 
-            this.clientUsername = bufferedReader.readLine();
-            this.otherClientUsername = bufferedReader.readLine();
-
+//            this.clientUsername = bufferedReader.readLine();
+//            this.otherClientUsername = bufferedReader.readLine();
             this.outputStream= new DataOutputStream(socket.getOutputStream());
             this.inputStream = new DataInputStream(socket.getInputStream());
+            this.clientUsername = inputStream.readUTF();
+            this.otherClientUsername = inputStream.readUTF();
+
+
             clientHandlers.add(this);
 
             System.out.println("SERVER: " + clientUsername + " giriş yaptı!");
@@ -46,59 +48,24 @@ public class ClientHandler implements Runnable {
     @Override
     public void run() {
 
-        //!  Capturing the client public key
-        byte[] bytePublicKey=null;
-        try {
-            int length= inputStream.readInt();
-            if(length>0){
-                bytePublicKey = new byte[length];
-                inputStream.readFully(bytePublicKey,0,length);
-            }
-            System.out.println(clientUsername+" public key: "+byteToHex(bytePublicKey));
-            clientBroadcastMessage(bytePublicKey);
-
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        //! infinity loop message send
-        byte[] messageFromClient=null;
         while (socket.isConnected()) {
             try {
-                int length = inputStream.readInt();
-                if(length>0){
-                    messageFromClient = new byte[length];
-                    inputStream.readFully(messageFromClient,0,length);
-                }
-                broadcastMessage(messageFromClient);
-            } catch (IOException e) {
+                broadcastMessage(inputStream.readUTF());
+            } catch (Exception e) {
                 closeEverything(socket, bufferedReader, bufferedWriter,outputStream,inputStream);
                 break;
             }
         }
     }
 
-    String byteToHex(final byte[] hash)
-    {
-        Formatter formatter = new Formatter();
-        for (byte b : hash)
-        {
-            formatter.format("%02x ", b);
-        }
-        String result = formatter.toString();
-        formatter.close();
-        return result;
-    }
 
-    public void broadcastMessage(byte[] messageToSend) {
+    public void broadcastMessage(String messageToSend) {
         for (ClientHandler clientHandler : clientHandlers) {
             try {
-
                 //! istemci kendi dışında ki istemcilere mesaj yollama koşulu.
                 if (clientHandler.clientUsername.equals(otherClientUsername)) {
-                    clientHandler.outputStream.write(messageToSend);
-                    clientHandler.outputStream.flush();
-                    this.state = State.SEND_MESSAGE;
+                    clientHandler.outputStream.writeUTF(messageToSend);
+
                 }
             } catch (IOException e) {
                 // Gracefully close everything.
@@ -108,31 +75,15 @@ public class ClientHandler implements Runnable {
     }
 
 
-    public void clientBroadcastMessage(byte[] messageToSend) {
-        for (ClientHandler clientHandler : clientHandlers) {
-            try {
-                if (clientHandler.clientUsername.equals(clientUsername)) {
-                    // MessageListener messageListener = new MessageListener();
-                    clientHandler.outputStream.write(messageToSend);
-                    clientHandler.outputStream.flush();
-                    this.state = State.SEND_PUBLIC_KEY;
-                }
-            } catch (IOException e) {
-                // Gracefully close everything.
-                closeEverything(socket, bufferedReader, bufferedWriter,outputStream,inputStream);
-            }
-        }
-    }
 
     //! Function to run when the client leaves the chat screen.
     public void removeClientHandler() {
         clientHandlers.remove(this);
         System.out.println("SERVER: " + clientUsername + " sohbet ekranından ayrıldı!");
-        this.state = State.BYE;
     }
 
     //! Function to close all builds.
-    public void closeEverything(Socket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter,DataOutputStream out,DataInputStream in) {
+    public void closeEverything(SSLSocket socket, BufferedReader bufferedReader, BufferedWriter bufferedWriter,DataOutputStream out,DataInputStream in) {
         removeClientHandler();
         try {
             if (bufferedReader != null) {

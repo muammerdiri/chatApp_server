@@ -1,21 +1,22 @@
 import model.ClientHandler;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
 import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+
 
 public class Server {
 
-    private final ServerSocket serverSocket;
+    private final SSLServerSocket serverSocket;
 
-    public Server(ServerSocket serverSocket) {
+    public Server(SSLServerSocket serverSocket) {
         this.serverSocket = serverSocket;
     }
 
     public void startServer() {
         try {
             while (!serverSocket.isClosed()) {
-                Socket socket = serverSocket.accept();
+                SSLSocket socket = (SSLSocket) serverSocket.accept();
 
                 ClientHandler clientHandler = new ClientHandler(socket);
                 Thread thread = new Thread(clientHandler);
